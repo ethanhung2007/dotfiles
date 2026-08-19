@@ -1,0 +1,63 @@
+// ~/.config/waybar/config.jsonc
+{
+    "layer": "top",
+    "position": "top",
+    "height": 32,
+    "margin-top": 8,
+    "margin-left": 10,
+    "margin-right": 10,
+    "spacing": 0,
+
+    "modules-left": ["hyprland/workspaces", "hyprland/window"],
+    "modules-center": ["clock"],
+    "modules-right": ["pulseaudio", "network", "battery", "tray"],
+
+    "hyprland/workspaces": {
+        "format": "{icon}",
+        "format-icons": {
+            "default": "",
+            "active": "",
+            "empty": ""
+        },
+        "persistent-workspaces": {
+            "1": [], "2": [], "3": [], "4": [], "5": []
+        }
+    },
+
+    "hyprland/window": {
+        "max-length": 40,
+        "separate-outputs": true
+    },
+
+    "clock": {
+        "format": "{:%H:%M   %a %d %b}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    },
+
+    "pulseaudio": {
+        "format": "{volume}%  ",
+        "format-muted": "muted",
+        "on-click": "pavucontrol"
+    },
+
+    "network": {
+        "format-wifi": "{essid} ",
+        "format-ethernet": "eth",
+        "format-disconnected": "offline",
+        "tooltip-format": "{ipaddr}"
+    },
+
+    "battery": {
+        "format": "{capacity}%",
+        "format-charging": "{capacity}% ",
+        "states": {
+            "warning": 25,
+            "critical": 10
+        }
+    },
+
+    "tray": {
+        "icon-size": 15,
+        "spacing": 8
+    }
+}

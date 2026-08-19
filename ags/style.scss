@@ -1,0 +1,248 @@
+// ~/.config/ags/style.scss
+// Compiled to CSS by AGS at build time (sass support is built in).
+
+$bg: #0f1013;
+$bg-alt: #17181c;
+$surface: #1e1f24;
+$fg: #c8c9d0;
+$fg-dim: #75767f;
+$fg-dimmer: #4a4b52;
+$fg-empty: #2a2b30;
+$accent: #8fa3b3;
+$border: #2a2b30;
+$danger: #b3808f;
+
+* {
+    font-family: "JetBrainsMono Nerd Font", sans-serif;
+    font-size: 12px;
+    color: $fg;
+}
+
+// ---- Bar shell ----
+.bar {
+    background-color: rgba(15, 16, 19, 0.85);
+    border-bottom: 1px solid $border;
+    padding: 4px 14px;
+}
+
+// ---- Workspaces ----
+.workspaces {
+    // holds workspace-row + workspace-underline stacked via the box's
+    // own layout in Workspaces.tsx
+}
+
+.workspace-row {
+    padding-bottom: 2px;
+}
+
+.workspace-slot {
+    background: transparent;
+    border: none;
+    min-width: 22px;
+    padding: 0;
+
+    label {
+        font-size: 11px;
+        color: $fg-empty; // default: empty/unopened
+    }
+
+    &:hover label {
+        color: $fg-dim;
+    }
+}
+
+// applied dynamically in Workspaces.tsx via toggleClassName
+.workspace-slot .focused {
+    color: $fg;
+    font-weight: 500;
+}
+.workspace-slot .occupied {
+    color: $fg-dimmer;
+}
+.workspace-slot .empty {
+    color: $fg-empty;
+}
+
+.workspace-underline {
+    min-width: 14px;
+    min-height: 2px;
+    background-color: $accent;
+    border-radius: 2px;
+    transition: margin 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// ---- Clock ----
+.clock-btn {
+    background: transparent;
+    border: none;
+    padding: 2px 10px;
+    border-radius: 6px;
+
+    &:hover {
+        background: rgba(200, 201, 208, 0.06);
+    }
+}
+
+.clock-time {
+    font-weight: 500;
+    font-size: 12px;
+}
+
+.clock-date {
+    color: $fg-dim;
+    font-size: 11px;
+}
+
+// ---- Right-side icon cluster ----
+.bar-icon {
+    background: transparent;
+    border: none;
+    padding: 2px 6px;
+    color: $fg-dim;
+
+    &:hover {
+        color: $fg;
+    }
+}
+
+// ---- Popover shell (shared by clock panel + wifi/bt/volume) ----
+.popover-window {
+    background: transparent;
+}
+
+.popover-panel,
+.clock-panel {
+    background: rgba(23, 24, 28, 0.95);
+    border: 1px solid $border;
+    border-radius: 12px;
+    padding: 14px;
+    margin: 6px 14px 0 0;
+    min-width: 260px;
+}
+
+.popover-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 8px;
+    border-bottom: 1px solid $border;
+    margin-bottom: 8px;
+}
+
+// ---- Clock panel: media / stats / toggles ----
+.media {
+    padding-bottom: 12px;
+    border-bottom: 1px solid $border;
+    margin-bottom: 12px;
+}
+
+.media-btn {
+    background: transparent;
+    border: none;
+    color: $fg-dim;
+    padding: 2px 4px;
+
+    &:hover {
+        color: $fg;
+    }
+}
+
+.media-title {
+    color: $fg;
+    font-size: 11px;
+}
+
+.stats-row {
+    padding-bottom: 12px;
+    border-bottom: 1px solid $border;
+    margin-bottom: 12px;
+}
+
+.stat {
+    // vertical stack: value on top, label below
+}
+
+.stat-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: $fg;
+}
+
+.stat-label {
+    font-size: 10px;
+    color: $fg-dim;
+}
+
+.toggle-row {
+    // horizontal row of toggle-btn
+}
+
+.toggle-btn {
+    background: rgba(200, 201, 208, 0.06);
+    border: none;
+    border-radius: 8px;
+    padding: 8px;
+    color: $fg-dim;
+    font-size: 11px;
+
+    &:hover {
+        background: rgba(200, 201, 208, 0.1);
+    }
+}
+
+.toggle-btn.active {
+    background: rgba(143, 163, 179, 0.14);
+    color: $accent;
+}
+
+// ---- Power menu ----
+.power-menu {
+    padding-top: 10px;
+    margin-top: 10px;
+    border-top: 1px solid $border;
+}
+
+.power-btn {
+    background: rgba(200, 201, 208, 0.06);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 10px;
+    color: $fg;
+    font-size: 11px;
+
+    &:hover {
+        background: rgba(200, 201, 208, 0.1);
+    }
+}
+
+.power-btn-danger:hover {
+    background: rgba(179, 128, 143, 0.14);
+    color: $danger;
+}
+
+// ---- Volume popover ----
+.volume-slider {
+    min-height: 4px;
+}
+
+.output-item,
+.network-item,
+.device-item {
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 8px;
+    text-align: left;
+    color: $fg-dim;
+
+    &:hover {
+        background: rgba(200, 201, 208, 0.06);
+        color: $fg;
+    }
+}
+
+.output-item-active,
+.network-item-active,
+.device-item-active {
+    color: $accent;
+}

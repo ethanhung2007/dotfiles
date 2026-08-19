@@ -1,0 +1,18 @@
+# ~/.config/mako/config
+
+background-color=#17181cee
+text-color=#c8c9d0
+border-color=#2a2b30
+border-size=1
+border-radius=8
+padding=12
+margin=10
+default-timeout=6000
+font=JetBrainsMono Nerd Font 11
+anchor=top-right
+width=340
+height=110
+
+[urgency=critical]
+border-color=#b3808f
+default-timeout=0

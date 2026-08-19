@@ -1,0 +1,14 @@
+# ~/.config/wofi/config
+width=480
+height=340
+location=center
+show=drun
+prompt=search
+insensitive=true
+allow_markup=true
+no_actions=true
+halign=fill
+orientation=vertical
+content_halign=fill
+hide_scroll=true
+term=kitty
