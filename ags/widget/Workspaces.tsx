@@ -1,76 +1,46 @@
 // ~/.config/ags/widget/Workspaces.tsx
 //
 // Fixed 1-9 slots (never reflow — SUPER+7 always lands in visual position 7,
-// even if 4-6 were never opened). Three brightness tiers:
-//   - focused workspace: brightest (--ws-focused)
-//   - occupied but not focused: medium (--ws-occupied)
-//   - never-opened / empty: dim, near-invisible (--ws-empty)
-// A thin underline slides beneath whichever slot is focused, driven purely
-// by a CSS `left` transition — same trick as the mockup.
-//
-// NOTE: AstalHyprland's exact API (get_default, focusedWorkspace, workspaces,
-// notify signals) should be double checked against `ags docs` / current
-// astal-hyprland gir on the real machine — this library's surface moves
-// between releases and I can't compile-check it in this sandbox.
+// even if 4-6 were never opened). Each slot is a symmetric square button;
+// the focused one gets a full highlighted box background (see
+// .workspace-slot.focused in style.scss) rather than an underline.
 
-import { Gtk } from "astal/gtk3"
+import { Gtk } from "ags/gtk3"
+import { createBinding, createComputed } from "ags"
 import Hyprland from "gi://AstalHyprland"
 
 const hypr = Hyprland.get_default()
 
 const WORKSPACE_COUNT = 9
-const SLOT_WIDTH = 22 // px — must match .workspace-slot width in style.scss
+
+const focusedId = createBinding(hypr, "focusedWorkspace")((w) => w?.id ?? 1)
+const workspaces = createBinding(hypr, "workspaces")
 
 export default function Workspaces() {
-    let underline: Gtk.Box
-    let slots: Gtk.Label[] = []
-
-    const occupiedIds = () => new Set(hypr.get_workspaces().map((w) => w.id))
-
-    const render = () => {
-        const occupied = occupiedIds()
-        const focusedId = hypr.focusedWorkspace?.id ?? 1
-
-        slots.forEach((label, i) => {
-            const id = i + 1
-            label.toggleClassName("focused", id === focusedId)
-            label.toggleClassName("occupied", occupied.has(id) && id !== focusedId)
-            label.toggleClassName("empty", !occupied.has(id) && id !== focusedId)
-        })
-
-        underline.set_margin_start((focusedId - 1) * SLOT_WIDTH)
-    }
-
     return (
-        <box className="workspaces" valign={Gtk.Align.CENTER}>
-            <box className="workspace-row" vertical={false}>
+        <box class="workspaces" valign={Gtk.Align.CENTER}>
+            <box class="workspace-row" spacing={2}>
                 {Array.from({ length: WORKSPACE_COUNT }, (_, i) => {
                     const id = i + 1
+
+                    const slotClass = createComputed(() => {
+                        if (id === focusedId()) return "workspace-slot focused"
+                        if (workspaces().some((w) => w.id === id)) return "workspace-slot occupied"
+                        return "workspace-slot empty"
+                    })
+
                     return (
                         <button
-                            className="workspace-slot"
+                            class={slotClass}
+                            halign={Gtk.Align.CENTER}
+                            valign={Gtk.Align.CENTER}
                             onClicked={() => hypr.get_workspace(id)?.focus()}
                         >
-                            <label
-                                label={`${id}`}
-                                setup={(self) => (slots[i] = self)}
-                            />
+                            <label label={`${id}`} halign={Gtk.Align.CENTER} valign={Gtk.Align.CENTER} />
                         </button>
                     )
                 })}
             </box>
-
-            <box
-                className="workspace-underline"
-                halign={Gtk.Align.START}
-                setup={(self) => {
-                    underline = self
-
-                    hypr.connect("event", render) // covers focus + open/close
-                    render()
-                }}
-            />
         </box>
     )
 }
-

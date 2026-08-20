@@ -1,27 +1,32 @@
 // ~/.config/ags/widget/Bluetooth.tsx
-//
-// NOTE: AstalBluetooth API (get_default(), adapter.powered, devices,
-// device.connect_device) — check against current astal-bluetooth docs.
 
-import { Gtk } from "astal/gtk3"
-import { Variable, bind } from "astal"
+import { Gtk } from "ags/gtk3"
+import { createState, createBinding, For } from "ags"
 import Bluetooth from "gi://AstalBluetooth"
 
+// bt.adapter is null when bluez isn't installed/running, even though
+// Bluetooth.get_default() itself succeeds — guard both, not just `bt`.
 const bt = Bluetooth.get_default()
-export const bluetoothPopoverOpen = Variable(false)
+const adapter = bt?.adapter
+export const [bluetoothPopoverOpen, setBluetoothPopoverOpen] = createState(false)
 
 export function BluetoothIcon() {
     return (
         <button
-            className="bar-icon"
-            onClicked={() => bluetoothPopoverOpen.set(!bluetoothPopoverOpen.get())}
+            class="bar-pill bar-icon icon-only"
+            onClicked={() => setBluetoothPopoverOpen((v) => !v)}
         >
             <label
-                label={
-                    bt
-                        ? bind(bt.adapter, "powered").as((p) => (p ? "on" : "off"))
-                        : "—"
+                class={
+                    adapter
+                        ? createBinding(adapter, "powered")((p) =>
+                              p ? "bar-icon-glyph" : "bar-icon-glyph dim"
+                          )
+                        : "bar-icon-glyph dim"
                 }
+                halign={Gtk.Align.CENTER}
+                valign={Gtk.Align.CENTER}
+                label={""}
             />
         </button>
     )
@@ -29,34 +34,34 @@ export function BluetoothIcon() {
 
 export function BluetoothPopover() {
     return (
-        <box className="popover-panel" vertical spacing={8}>
-            <box className="popover-header">
-                <label label="bluetooth" />
+        <box class="popover-panel" vertical spacing={8}>
+            <box class="popover-header">
+                <label label="bluetooth" hexpand halign={Gtk.Align.START} />
                 <switch
-                    active={bt ? bind(bt.adapter, "powered") : false}
-                    onNotifyActive={({ active }) => bt && (bt.adapter.powered = active)}
+                    active={adapter ? createBinding(adapter, "powered") : false}
+                    onNotifyActive={(self) => adapter && (adapter.powered = self.active)}
                 />
             </box>
 
-            <box className="device-list" vertical spacing={4}>
-                {bt
-                    ? bind(bt, "devices").as((devices) =>
-                          devices.map((d) => (
-                              <button
-                                  className={
-                                      d.connected
-                                          ? "device-item device-item-active"
-                                          : "device-item"
-                                  }
-                                  onClicked={() =>
-                                      d.connected ? d.disconnect_device() : d.connect_device()
-                                  }
-                              >
-                                  <label label={d.name ?? d.address} />
-                              </button>
-                          ))
-                      )
-                    : null}
+            <box class="device-list" vertical spacing={4}>
+                {bt ? (
+                    <For each={createBinding(bt, "devices")}>
+                        {(d) => (
+                            <button
+                                class={
+                                    d.connected
+                                        ? "device-item device-item-active"
+                                        : "device-item"
+                                }
+                                onClicked={() =>
+                                    d.connected ? d.disconnect_device() : d.connect_device()
+                                }
+                            >
+                                <label label={d.name ?? d.address} xalign={0} />
+                            </button>
+                        )}
+                    </For>
+                ) : null}
             </box>
         </box>
     )

@@ -1,20 +1,20 @@
 /* ~/.config/wofi/style.css */
 
 window {
-    background-color: rgba(15, 16, 19, 0.92);
-    border: 1px solid #2a2b30;
+    background-color: rgba(26, 27, 38, 0.92);
+    border: 1px solid #292e42;
     border-radius: 10px;
-    font-family: "JetBrainsMono Nerd Font", monospace;
+    font-family: "Noto Sans", sans-serif;
     font-size: 14px;
 }
 
 #input {
     margin: 12px;
     padding: 8px 10px;
-    background-color: #17181c;
-    border: 1px solid #2a2b30;
+    background-color: #16161e;
+    border: 1px solid #292e42;
     border-radius: 6px;
-    color: #c8c9d0;
+    color: #c0caf5;
 }
 
 #inner-box {
@@ -29,17 +29,17 @@ window {
 #entry {
     padding: 8px;
     border-radius: 6px;
-    color: #c8c9d0;
+    color: #c0caf5;
 }
 
 #entry:selected {
-    background-color: rgba(143, 163, 179, 0.14);
+    background-color: rgba(122, 162, 247, 0.14);
 }
 
 #text {
-    color: #c8c9d0;
+    color: #c0caf5;
 }
 
 #text:selected {
-    color: #8fa3b3;
+    color: #7aa2f7;
 }

@@ -68,7 +68,7 @@ yay -S --needed --noconfirm "${AUR_PKGS[@]}"
 echo "==> Linking config files..."
 mkdir -p "$CONFIG_DIR"
 
-for dir in hypr ags kitty wofi mako gtk-3.0; do
+for dir in hypr ags kitty wofi mako gtk-3.0 gtk-4.0; do
     target="$CONFIG_DIR/$dir"
     if [ -e "$target" ] && [ ! -L "$target" ]; then
         echo "    backing up existing $target -> ${target}.bak"

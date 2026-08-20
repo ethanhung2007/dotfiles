@@ -5,8 +5,8 @@
 // be wrong/slow on VPNs). Replace TAIPEI below with wherever the machine
 // actually lives, or swap to lat/long if you want more precision.
 
-import { Gtk } from "astal/gtk3"
-import { Variable, exec } from "astal"
+import { createPoll } from "ags/time"
+import { exec } from "ags/process"
 
 const LOCATION = "Taipei"
 
@@ -21,12 +21,13 @@ function fetchWeather(): string {
     }
 }
 
-export const weather = Variable("—").poll(15 * 60 * 1000, fetchWeather) // every 15 min
+export const weather = createPoll("—", 15 * 60 * 1000, () => fetchWeather()) // every 15 min
 
 export default function Weather() {
     return (
-        <box className="bar-icon">
-            <label label={weather()} />
+        <box class="bar-pill bar-icon" spacing={4}>
+            <label class="bar-icon-glyph" label="" />
+            <label label={weather} />
         </box>
     )
 }

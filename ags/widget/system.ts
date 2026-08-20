@@ -1,27 +1,23 @@
 // ~/.config/ags/widget/system.ts
 //
 // Polling-based stats — no dedicated Astal library for raw CPU/RAM/temp,
-// so this reads /proc directly on a timer via Astal's Variable.poll(),
-// which re-runs the given function on an interval and exposes the result
-// as a reactive Variable.
-//
-// NOTE: Variable.poll's exact signature — confirm against `ags docs` on
-// the real machine, this is the pattern from Astal's own examples as of
-// my last training data but may have shifted.
+// so this reads /proc directly on a timer via ags's createPoll (from
+// "ags/time"), which re-runs the given function on an interval and exposes
+// the result as a reactive Accessor.
 
-import { Variable } from "astal"
-import { readFileSync } from "fs"
+import { createPoll } from "ags/time"
+import { readFile } from "ags/file"
 
 function readCpuPercent(): number {
     // crude two-sample /proc/stat read; good enough for a glance-value
-    const a = readFileSync("/proc/stat", "utf8").split("\n")[0].split(/\s+/).slice(1).map(Number)
+    const a = readFile("/proc/stat").split("\n")[0].split(/\s+/).slice(1).map(Number)
     const idle1 = a[3]
     const total1 = a.reduce((s, n) => s + n, 0)
 
     // busy-wait a tiny bit isn't ideal in a UI thread — in the real widget,
     // prefer diffing against the previous poll's stored values instead of
     // sampling twice synchronously here.
-    const b = readFileSync("/proc/stat", "utf8").split("\n")[0].split(/\s+/).slice(1).map(Number)
+    const b = readFile("/proc/stat").split("\n")[0].split(/\s+/).slice(1).map(Number)
     const idle2 = b[3]
     const total2 = b.reduce((s, n) => s + n, 0)
 
@@ -31,7 +27,7 @@ function readCpuPercent(): number {
 }
 
 function readRamUsedGb(): string {
-    const lines = readFileSync("/proc/meminfo", "utf8").split("\n")
+    const lines = readFile("/proc/meminfo").split("\n")
     const get = (key: string) =>
         Number(lines.find((l) => l.startsWith(key))?.match(/\d+/)?.[0] ?? 0)
 
@@ -47,15 +43,13 @@ function readTempC(): string {
     // the right zone (this assumes zone0 is the CPU package, often true
     // but not guaranteed).
     try {
-        const milli = Number(
-            readFileSync("/sys/class/thermal/thermal_zone0/temp", "utf8").trim()
-        )
+        const milli = Number(readFile("/sys/class/thermal/thermal_zone0/temp").trim())
         return `${Math.round(milli / 1000)}c`
     } catch {
         return "—"
     }
 }
 
-export const cpuUsage = Variable(0).poll(2000, () => readCpuPercent())
-export const ramUsage = Variable("0gb").poll(3000, () => readRamUsedGb())
-export const cpuTemp = Variable("—").poll(3000, () => readTempC())
+export const cpuUsage = createPoll(0, 2000, () => readCpuPercent())
+export const ramUsage = createPoll("0gb", 3000, () => readRamUsedGb())
+export const cpuTemp = createPoll("—", 3000, () => readTempC())

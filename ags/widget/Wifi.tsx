@@ -1,63 +1,64 @@
 // ~/.config/ags/widget/Wifi.tsx
-//
-// NOTE: AstalNetwork API (get_default(), wifi.enabled, wifi.accessPoints,
-// activate_connection) — check against current astal-network docs on the
-// real machine.
 
-import { Gtk } from "astal/gtk3"
-import { Variable, bind, exec } from "astal"
+import { Gtk } from "ags/gtk3"
+import { createState, createBinding, For } from "ags"
+import { exec } from "ags/process"
 import Network from "gi://AstalNetwork"
 
+// network.wifi is null when there's no wifi hardware/NetworkManager wifi
+// device, even though Network.get_default() itself succeeds.
 const network = Network.get_default()
-export const wifiPopoverOpen = Variable(false)
+const wifi = network?.wifi
+export const [wifiPopoverOpen, setWifiPopoverOpen] = createState(false)
 
 export function WifiIcon() {
     return (
         <button
-            className="bar-icon"
-            onClicked={() => wifiPopoverOpen.set(!wifiPopoverOpen.get())}
+            class="bar-pill bar-icon icon-only"
+            onClicked={() => setWifiPopoverOpen((v) => !v)}
         >
             <label
-                label={
-                    network
-                        ? bind(network.wifi, "strength").as((s) =>
-                              network.wifi.enabled ? `${s}%` : "off"
+                class={
+                    wifi
+                        ? createBinding(wifi, "enabled")((e) =>
+                              e ? "bar-icon-glyph" : "bar-icon-glyph dim"
                           )
-                        : "—"
+                        : "bar-icon-glyph dim"
                 }
+                halign={Gtk.Align.CENTER}
+                valign={Gtk.Align.CENTER}
+                label={""}
             />
         </button>
     )
 }
 
 export function WifiPopover() {
-    const wifi = network?.wifi
-
     return (
-        <box className="popover-panel" vertical spacing={8}>
-            <box className="popover-header">
-                <label label="wifi" />
+        <box class="popover-panel" vertical spacing={8}>
+            <box class="popover-header">
+                <label label="wifi" hexpand halign={Gtk.Align.START} />
                 <switch
-                    active={wifi ? bind(wifi, "enabled") : false}
-                    onNotifyActive={({ active }) => wifi && (wifi.enabled = active)}
+                    active={wifi ? createBinding(wifi, "enabled") : false}
+                    onNotifyActive={(self) => wifi && (wifi.enabled = self.active)}
                 />
             </box>
 
-            <box className="network-list" vertical spacing={4}>
-                {wifi
-                    ? bind(wifi, "accessPoints").as((aps) =>
-                          aps.map((ap) => (
-                              <button
-                                  className="network-item"
-                                  onClicked={() =>
-                                      exec(`nmcli device wifi connect "${ap.ssid}"`)
-                                  }
-                              >
-                                  <label label={ap.ssid ?? "unknown"} />
-                              </button>
-                          ))
-                      )
-                    : null}
+            <box class="network-list" vertical spacing={4}>
+                {wifi ? (
+                    <For each={createBinding(wifi, "accessPoints")}>
+                        {(ap) => (
+                            <button
+                                class="network-item"
+                                onClicked={() =>
+                                    exec(`nmcli device wifi connect "${ap.ssid}"`)
+                                }
+                            >
+                                <label label={ap.ssid ?? "unknown"} xalign={0} />
+                            </button>
+                        )}
+                    </For>
+                ) : null}
             </box>
         </box>
     )
